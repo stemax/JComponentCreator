@@ -1,11 +1,13 @@
 # JComponentCreator
 ==============
 JcomponentCreator class for creating the work-piece for Joomla! component
-Current class generates the workpiece component for Joomla! developers.
 --------------
+Current class generates the workpiece component for Joomla! developers.
+
 **(Allow J! versions 1.6.x, 2.5.x, 3.x )**
 
-#[Version 1.0.0 include:]
+[Version 1.0.0 include:]
+--------------
 **- Administrator part**
 - Valid component XML file
 - Create component menu option
