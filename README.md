@@ -3,6 +3,8 @@ JComponentCreator class for creating the work-piece of component for Joomla! web
 ==============
 Current class generates the work-piece of component for Joomla! developers.
 
+>The result is ZIP-archive(J!install) of the component work-piece for further developing. Greatly accelerates the process of developing a component for the latest version Joomla! CMS.
+
 **(Allow J! versions 1.6.x, 2.5.x, 3.x )**
 
 #[Version 1.0.0 include:]
