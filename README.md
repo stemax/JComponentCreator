@@ -15,7 +15,8 @@ Current class generates the work-piece component for Joomla! developers.
 - Languages ini files [ +sys file]
 - Install script with install, uninstall, update, preflight, postflight methods';
 - Security index.html files
---------------
+
 **- Front-end part**
-- Security index.html file
-- TODO add MVC
+--------------
+* Security index.html file
+* TODO add MVC
