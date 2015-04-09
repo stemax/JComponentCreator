@@ -5,9 +5,9 @@ Current class generates the work-piece of component for Joomla! developers.
 
 **(Allow J! versions 1.6.x, 2.5.x, 3.x )**
 
-[Version 1.0.0 include:]
---------------
+#[Version 1.0.0 include:]
 **- Administrator part (MVC)**
+--------------
 - Valid component XML file
 - Create component menu option
 - Controllers/Models/Forms/Fields/Views folders
