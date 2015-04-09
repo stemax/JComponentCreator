@@ -7,7 +7,7 @@ Current class generates the work-piece component for Joomla! developers.
 
 [Version 1.0.0 include:]
 --------------
-**- Administrator part**
+**- Administrator part (MVC)**
 - Valid component XML file
 - Create component menu option
 - Controllers/Models/Forms/Fields/Views folders
@@ -15,3 +15,7 @@ Current class generates the work-piece component for Joomla! developers.
 - Languages ini files [ +sys file]
 - Install script with install, uninstall, update, preflight, postflight methods';
 - Security index.html files
+--------------
+**- Front-end part**
+- Security index.html file
+- TODO add MVC
