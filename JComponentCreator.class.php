@@ -292,13 +292,20 @@ class JComponentCreator {
 			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 			<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+			<style>
+                .header_3d
+                {
+                    color: #fffffc;
+                    text-shadow: 0 1px 0 #999, 0 2px 0 #888, 0 3px 0 #777, 0 4px 0 #666, 0 5px 0 #555, 0 6px 0 #444, 0 7px 0 #333, 0 8px 7px #001135;
+                }
+            </style>
 			<title>J! Component Creator</title>
 		</head>
 		<body>
 			<form method="post" action="index.php" name="subform"  class="form"/>
 			<div class="jumbotron navbar-form">
 
-				<div class="container"> <div class="page-header"><h1>J! Component Creator:</h1></div>
+				<div class="container"> <div class="page-header header_3d"><h1>J! Component Creator:</h1></div>
 				<table width="50%" class="table table-striped table-hover">
 					<tr>
 						<td>System name of component:</td>
