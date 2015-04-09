@@ -1,8 +1,7 @@
 # JComponentCreator
-==============
 JcomponentCreator class for creating the work-piece for Joomla! component
---------------
-Current class generates the workpiece component for Joomla! developers.
+==============
+Current class generates the work-piece component for Joomla! developers.
 
 **(Allow J! versions 1.6.x, 2.5.x, 3.x )**
 
