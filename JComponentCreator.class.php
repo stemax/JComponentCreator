@@ -200,7 +200,12 @@ class JComponentCreator {
             mkdir("site");
         }
 
-        $this->addToZip($this->createFile('site/index.html', '<html><body></body></html>'));
+        $this->addToZip($this->createFile('site/index.html', $this->getEmptyHtml()));
+    }
+
+    function getEmptyHtml()
+    {
+        return '<html><body></body></html>';
     }
 
     function generateAdminFolders()
@@ -218,15 +223,14 @@ class JComponentCreator {
             mkdir("languages");
         }
 
-
-        $this->addToZip($this->createFile('admin/index.html', '<html><body></body></html>'));
-        $this->addToZip($this->createFile('admin/controllers/index.html', '<html><body></body></html>'));
-        $this->addToZip($this->createFile('admin/models/index.html', '<html><body></body></html>'));
-        $this->addToZip($this->createFile('admin/models/fields/index.html', '<html><body></body></html>'));
-        $this->addToZip($this->createFile('admin/models/forms/index.html', '<html><body></body></html>'));
-        $this->addToZip($this->createFile('admin/views/index.html', '<html><body></body></html>'));
-        $this->addToZip($this->createFile("admin/views/".$this->compname.'/index.html', '<html><body></body></html>'));
-        $this->addToZip($this->createFile("admin/views/".$this->compname.'/tmpl/index.html', '<html><body></body></html>'));
+        $this->addToZip($this->createFile('admin/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile('admin/controllers/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile('admin/models/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile('admin/models/fields/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile('admin/models/forms/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile('admin/views/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile("admin/views/".$this->compname.'/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile("admin/views/".$this->compname.'/tmpl/index.html', $this->getEmptyHtml()));
         $this->addToZip($this->createFile("admin/views/".$this->compname.'/tmpl/default.php', "<?php defined('_JEXEC') or die;"));
         $this->addToZip($this->createFile('languages/en-GB.'.$this->sname.'.ini', strtoupper($this->sname).'="'.(ucwords($this->name)).'"'));
         $this->addToZip($this->createFile('languages/en-GB.'.$this->sname.'.sys.ini', strtoupper($this->sname).'="'.(ucwords($this->name)).'"'));
@@ -268,7 +272,7 @@ class JComponentCreator {
 		if (isset($_POST['sname']) && $_POST['name']) {
 			$this->addToZip($this->createFile($this->compname . '.xml', $this->generateXml()));
 			$this->addToZip($this->createFile( 'script.php', $this->generateInstallerScript()));
-			$this->addToZip($this->createFile('index.html', '<html><body></body></html>'));
+			$this->addToZip($this->createFile('index.html', $this->getEmptyHtml()));
 			$this->generateSiteFolders();
 			$this->generateAdminFolders();
 			$this->addToZip($this->createFile('admin/'.$this->compname . '.php', $this->generateAdminMainPhp()));
@@ -290,7 +294,7 @@ class JComponentCreator {
 		<head>
 			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
-			<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+			<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 			<style>
                 .header_3d
