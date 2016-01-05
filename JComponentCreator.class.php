@@ -76,7 +76,7 @@ class JComponentCreator
         return $php_str;
     }
 
-    function generateControllerPhp()
+    function generateAdminControllerPhp()
     {
         $php_content = array();
         $php_content [] = "<?php";
@@ -91,6 +91,62 @@ class JComponentCreator
         $php_content [] = 'function display($cachable = false, $urlparams = array())';
         $php_content [] = '{';
         $php_content [] = '  parent::display($cachable,$urlparams);';
+        $php_content [] = '}';
+        $php_content [] = '}';
+        $php_str = implode("\r\n", $php_content);
+        return $php_str;
+    }
+
+    function generateSiteMainPhp()
+    {
+        $php_content = array();
+        $php_content [] = "<?php";
+        $php_content [] = "defined('_JEXEC') or die;";
+        $php_content [] = '//require_once JPATH_COMPONENT . "/helpers/route.php";';
+        $php_content [] = '$controller = JControllerLegacy::getInstance("' . $this->compname . '");';
+        $php_content [] = '$controller->execute(JFactory::getApplication()->input->get("task"));';
+        $php_content [] = '$controller->redirect();';
+        $php_content [] = '';
+        $php_str = implode("\r\n", $php_content);
+        return $php_str;
+    }
+
+    function generateSiteControllerPhp()
+    {
+        $php_content = array();
+        $php_content [] = "<?php";
+        $php_content [] = "defined('_JEXEC') or die;";
+        $php_content [] = 'class ' . $this->compname . 'Controller extends JControllerLegacy';
+        $php_content [] = '{';
+        $php_content [] = 'function display($cachable = false, $urlparams = array())';
+        $php_content [] = '{';
+        $php_content [] = '$cachable = ($this->input->getMethod() == "POST") ? true : false;';
+        $php_content [] = '$safeurlparams = array(';
+        $php_content [] ="    'id' => 'ARRAY',";
+        $php_content [] ="    'limit' => 'UINT',";
+        $php_content [] ="    'limitstart' => 'UINT',";
+        $php_content [] ="    'filter_order' => 'CMD',";
+        $php_content [] ="    'filter_order_Dir' => 'CMD',";
+        $php_content [] ="    'lang' => 'CMD'";
+        $php_content [] = ');';
+        $php_content [] = ' return parent::display($cachable,$safeurlparams);';
+        $php_content [] = '}';
+        $php_content [] = '}';
+
+        $php_str = implode("\r\n", $php_content);
+        return $php_str;
+    }
+
+    function generateSiteViewPhp()
+    {
+        $php_content = array();
+        $php_content [] = "<?php";
+        $php_content [] = "defined('_JEXEC') or die;";
+        $php_content [] = 'class ' . $this->compname . 'View' . $this->compname . ' extends JViewLegacy';
+        $php_content [] = '{';
+        $php_content [] = 'function display($tpl = null)';
+        $php_content [] = '{';
+        $php_content [] = ' parent::display($tpl);';
         $php_content [] = '}';
         $php_content [] = '}';
         $php_str = implode("\r\n", $php_content);
@@ -133,6 +189,9 @@ class JComponentCreator
 
         $xml_content [] = '<files folder="site">';
         $xml_content [] = '<filename>index.html</filename>';
+        $xml_content [] = '<folder>views</folder>';
+        $xml_content [] = '<filename>' . $this->compname . '.php</filename>';
+        $xml_content [] = '<filename>controller.php</filename>';
         $xml_content [] = '</files>';
 
         $xml_content [] = '<administration>';
@@ -206,9 +265,16 @@ class JComponentCreator
     {
         if (!file_exists("site")) {
             mkdir("site");
+            mkdir("site/views");
+            mkdir("site/views/" . $this->compname);
+            mkdir("site/views/" . $this->compname . "/tmpl");
         }
 
         $this->addToZip($this->createFile('site/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile("site/views/" . $this->compname . '/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile("site/views/" . $this->compname . '/tmpl/index.html', $this->getEmptyHtml()));
+        $this->addToZip($this->createFile("site/views/" . $this->compname . '/tmpl/default.php', "<?php defined('_JEXEC') or die; ?> <div>    <h2>Test component front-end header...</h2>     <div>         Test component content...    </div></div>"));
+
     }
 
     function getEmptyHtml()
@@ -271,6 +337,9 @@ class JComponentCreator
         if (file_exists("admin/views")) rmdir("admin/views");
         if (file_exists("languages")) rmdir("languages");
         if (file_exists("admin")) rmdir("admin");
+        if (file_exists("site/views/" . $this->compname . '/tmpl')) rmdir("site/views/" . $this->compname . '/tmpl');
+        if (file_exists("site/views/" . $this->compname)) rmdir("site/views/" . $this->compname);
+        if (file_exists("site/views")) rmdir("site/views");
         if (file_exists("site")) rmdir("site");
     }
 
@@ -283,7 +352,11 @@ class JComponentCreator
             $this->generateSiteFolders();
             $this->generateAdminFolders();
             $this->addToZip($this->createFile('admin/' . $this->compname . '.php', $this->generateAdminMainPhp()));
-            $this->addToZip($this->createFile('admin/controller.php', $this->generateControllerPhp()));
+            $this->addToZip($this->createFile('admin/controller.php', $this->generateAdminControllerPhp()));
+
+            $this->addToZip($this->createFile('site/' . $this->compname . '.php', $this->generateSiteMainPhp()));
+            $this->addToZip($this->createFile('site/controller.php', $this->generateSiteControllerPhp()));
+            $this->addToZip($this->createFile('site/views/' . $this->compname . '/view.html.php', $this->generateSiteViewPhp()));
 
             $this->createAndSaveZip();
             $this->deleteTmpFolders();
