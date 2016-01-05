@@ -21,4 +21,4 @@ Current class generates the work-piece of component for Joomla! developers.
 **- Front-end part**
 --------------
 * Security index.html file
-* TODO add MVC
+* Added default view
