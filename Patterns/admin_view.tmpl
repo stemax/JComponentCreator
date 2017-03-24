@@ -1,0 +1,14 @@
+<?php
+defined('_JEXEC') or die;
+jimport('joomla.application.component.view');
+
+class {COMPONENT_NAME}View{COMPONENT_NAME} extends JViewLegacy
+{
+    public $courses,$lps, $lpsteps_parents,$lpsteps_childs,$quizzes;
+    function display($tpl = null,$urlparams='')
+    {
+        JToolbarHelper::title(JText::_("{UPPER_COMPONENT_NAME}"), "info");
+
+        parent::display($tpl);
+    }
+}

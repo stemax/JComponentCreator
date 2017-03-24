@@ -1,0 +1,19 @@
+<?php
+defined('_JEXEC') or die;
+
+class {COMPONENT_NAME}Controller extends JControllerLegacy
+{
+    function display($cachable = false, $urlparams = array())
+    {
+        $cachable = ($this->input->getMethod() == "POST") ? true : false;
+        $safeurlparams = array(
+            'id' => 'ARRAY',
+            'limit' => 'UINT',
+            'limitstart' => 'UINT',
+            'filter_order' => 'CMD',
+            'filter_order_Dir' => 'CMD',
+            'lang' => 'CMD'
+        );
+        return parent::display($cachable, $safeurlparams);
+    }
+}

@@ -43,6 +43,7 @@ class JComponentCreator
     public $license = null;
     public $compname = null;
     public $zipfiles = array();
+    private $pattern_folder = 'Patterns';
 
     function __construct()
     {
@@ -59,180 +60,109 @@ class JComponentCreator
         $this->compname = trim(str_replace('com_', '', $this->sname));
     }
 
-    function generateAdminMainPhp()
+    private function getPhpFromTemplate($template_name, $placeholders, $replace)
     {
-        $php_content = array();
-        $php_content [] = "<?php";
-        $php_content [] = "defined('_JEXEC') or die;";
-        $php_content [] = '     if (!JFactory::getUser()->authorise("core.manage", "' . $this->sname . '")) {';
-        $php_content [] = '         return JError::raiseWarning(404, JText::_("JERROR_ALERTNOAUTHOR"));';
-        $php_content [] = '     }';
-        $php_content [] = 'jimport("joomla.application.component.controller");';
-        $php_content [] = '$controller = JControllerLegacy::getInstance("' . $this->compname . '");';
-        $php_content [] = '$controller->execute(JRequest::getCmd("task"));';
-        $php_content [] = '$controller->redirect();';
-        $php_content [] = '';
-        $php_str = implode("\r\n", $php_content);
-        return $php_str;
+        $template = $this->loadTemplate($template_name);
+        return str_replace($placeholders, $replace, $template);
     }
 
-    function generateAdminControllerPhp()
+    private function loadTemplate($template_name)
     {
-        $php_content = array();
-        $php_content [] = "<?php";
-        $php_content [] = "defined('_JEXEC') or die;";
-        $php_content [] = "jimport('joomla.application.component.controller');";
-        $php_content [] = 'class ' . $this->compname . 'Controller extends JControllerLegacy';
-        $php_content [] = '{';
-        $php_content [] = ' public function __construct($config = array())';
-        $php_content [] = '{';
-        $php_content [] = 'return parent::__construct($config);';
-        $php_content [] = '}';
-        $php_content [] = 'function display($cachable = false, $urlparams = array())';
-        $php_content [] = '{';
-        $php_content [] = '  parent::display($cachable,$urlparams);';
-        $php_content [] = '}';
-        $php_content [] = '}';
-        $php_str = implode("\r\n", $php_content);
-        return $php_str;
+        $path = $this->pattern_folder . DIRECTORY_SEPARATOR . $template_name . '.tmpl';
+        if (file_exists($path)) {
+            return file_get_contents($path);
+        }
+        return false;
     }
 
-    function generateSiteMainPhp()
+    private function generateAdminMainPhp()
     {
-        $php_content = array();
-        $php_content [] = "<?php";
-        $php_content [] = "defined('_JEXEC') or die;";
-        $php_content [] = '//require_once JPATH_COMPONENT . "/helpers/route.php";';
-        $php_content [] = '$controller = JControllerLegacy::getInstance("' . $this->compname . '");';
-        $php_content [] = '$controller->execute(JFactory::getApplication()->input->get("task"));';
-        $php_content [] = '$controller->redirect();';
-        $php_content [] = '';
-        $php_str = implode("\r\n", $php_content);
-        return $php_str;
+        return $this->getPhpFromTemplate('admin_component', [
+            '{SYSTEM_COMPONENT_NAME}',
+            '{COMPONENT_NAME}'
+        ], [
+            $this->sname,
+            $this->compname
+        ]);
     }
 
-    function generateSiteControllerPhp()
+    private function generateAdminControllerPhp()
     {
-        $php_content = array();
-        $php_content [] = "<?php";
-        $php_content [] = "defined('_JEXEC') or die;";
-        $php_content [] = 'class ' . $this->compname . 'Controller extends JControllerLegacy';
-        $php_content [] = '{';
-        $php_content [] = 'function display($cachable = false, $urlparams = array())';
-        $php_content [] = '{';
-        $php_content [] = '$cachable = ($this->input->getMethod() == "POST") ? true : false;';
-        $php_content [] = '$safeurlparams = array(';
-        $php_content [] ="    'id' => 'ARRAY',";
-        $php_content [] ="    'limit' => 'UINT',";
-        $php_content [] ="    'limitstart' => 'UINT',";
-        $php_content [] ="    'filter_order' => 'CMD',";
-        $php_content [] ="    'filter_order_Dir' => 'CMD',";
-        $php_content [] ="    'lang' => 'CMD'";
-        $php_content [] = ');';
-        $php_content [] = ' return parent::display($cachable,$safeurlparams);';
-        $php_content [] = '}';
-        $php_content [] = '}';
-
-        $php_str = implode("\r\n", $php_content);
-        return $php_str;
+        return $this->getPhpFromTemplate('admin_controller', ['{COMPONENT_NAME}'], [$this->compname]);
     }
 
-    function generateSiteViewPhp()
+    private function generateAdminView()
     {
-        $php_content = array();
-        $php_content [] = "<?php";
-        $php_content [] = "defined('_JEXEC') or die;";
-        $php_content [] = 'class ' . $this->compname . 'View' . $this->compname . ' extends JViewLegacy';
-        $php_content [] = '{';
-        $php_content [] = 'function display($tpl = null)';
-        $php_content [] = '{';
-        $php_content [] = ' parent::display($tpl);';
-        $php_content [] = '}';
-        $php_content [] = '}';
-        $php_str = implode("\r\n", $php_content);
-        return $php_str;
+        return $this->getPhpFromTemplate('admin_view', ['{COMPONENT_NAME}', '{UPPER_COMPONENT_NAME}'], [$this->compname, strtoupper($this->sname)]);
     }
 
-    function generateInstallerScript()
+
+    private function generateSiteMainPhp()
     {
-        $php_content = array();
-        $php_content [] = "<?php";
-        $php_content [] = "defined('_JEXEC') or die;";
-        $php_content [] = "class " . $this->sname . "InstallerScript ";
-        $php_content [] = '{';
-        $php_content [] = ' function install($parent){}';
-        $php_content [] = ' function uninstall($parent){}';
-        $php_content [] = ' function update($parent){}';
-        $php_content [] = ' function preflight($type, $parent) {}';
-        $php_content [] = ' function postflight($type, $parent) {}';
-        $php_content [] = '}';
-        $php_str = implode("\r\n", $php_content);
-        return $php_str;
+        return $this->getPhpFromTemplate('site_component', ['{COMPONENT_NAME}'], [$this->compname]);
     }
 
-    function generateXml()
+    private function generateSiteControllerPhp()
     {
-
-        $xml_content = array();
-        $xml_content [] = '<?xml version="1.0" encoding="utf-8"?>';
-        $xml_content [] = '<extension type="component" version="1.6.0" method="upgrade">';
-        $xml_content [] = '<name>' . $this->sname . '</name>';
-        $xml_content [] = '<creationDate>' . $this->creationdate . '</creationDate>';
-        $xml_content [] = '<author>' . $this->author . '</author>';
-        $xml_content [] = '<authorEmail>' . $this->authoremail . '</authorEmail>';
-        $xml_content [] = '<authorUrl>' . $this->authorurl . '</authorUrl>';
-        $xml_content [] = '<copyright>' . $this->copyright . ' [Generated by SMT JGenerator]</copyright>';
-        $xml_content [] = '<license>' . $this->license . '</license>';
-        $xml_content [] = '<version>' . $this->version . '</version>';
-        $xml_content [] = '<description>' . $this->descr . '</description>';
-        $xml_content [] = '<scriptfile>script.php</scriptfile>';
-
-        $xml_content [] = '<files folder="site">';
-        $xml_content [] = '<filename>index.html</filename>';
-        $xml_content [] = '<folder>views</folder>';
-        $xml_content [] = '<filename>' . $this->compname . '.php</filename>';
-        $xml_content [] = '<filename>controller.php</filename>';
-        $xml_content [] = '</files>';
-
-        $xml_content [] = '<administration>';
-        $xml_content [] = '<files folder="admin">';
-
-        $xml_content [] = '<filename>index.html</filename>';
-        $xml_content [] = '<filename>' . $this->compname . '.php</filename>';
-        $xml_content [] = '<filename>controller.php</filename>';
-        $xml_content [] = '<folder>controllers</folder>';
-        $xml_content [] = '<folder>models</folder>';
-        $xml_content [] = '<folder>views</folder>';
-        $xml_content [] = '</files>';
-
-        $xml_content [] = '<menu link="option=' . $this->sname . '" >' . $this->sname . '</menu>';
-
-        $xml_content [] = '<languages>';
-        $xml_content [] = '<language tag="en-GB">languages/en-GB.' . $this->sname . '.ini</language>';
-        $xml_content [] = '<language tag="en-GB">languages/en-GB.' . $this->sname . '.sys.ini</language>';
-        $xml_content [] = '</languages>';
-
-        $xml_content [] = '</administration>';
-
-        $xml_content [] = '</extension>';
-        $xml_str = implode("\r\n", $xml_content);
-        return $xml_str;
+        return $this->getPhpFromTemplate('site_controller', ['{COMPONENT_NAME}'], [$this->compname]);
     }
 
-    function createFile($filename = '', $content = '')
+    private function generateSiteViewPhp()
+    {
+        return $this->getPhpFromTemplate('site_view', ['{COMPONENT_NAME}'], [$this->compname]);
+    }
+
+    private function generateInstallerScript()
+    {
+        return $this->getPhpFromTemplate('install_script', ['{SYSTEM_COMPONENT_NAME}'], [$this->sname]);
+    }
+
+    private function generateXml()
+    {
+        return $this->getPhpFromTemplate('xml', [
+            '{SYSTEM_COMPONENT_NAME}',
+            '{COMPONENT_NAME}',
+            '{CREATION_DATE}',
+            '{AUTHOR_NAME}',
+            '{AUTHOR_EMAIL}',
+            '{AUTHOR_URL}',
+            '{COPYRIGHT}',
+            '{LICENSE}',
+            '{VERSION}',
+            '{DESCRIPTION}',
+        ], [
+            $this->sname,
+            $this->compname,
+            $this->creationdate,
+            $this->author,
+            $this->authoremail,
+            $this->authorurl,
+            $this->copyright,
+            $this->license,
+            $this->version,
+            $this->descr,
+        ]);
+    }
+
+    private function generateSiteLayout()
+    {
+        return $this->getPhpFromTemplate('site_layout', ['{COMPONENT_NAME}', '{DESCRIPTION}'], [$this->compname, $this->descr]);
+    }
+
+    private function createFile($filename = '', $content = '')
     {
         $fp = fopen($filename, "w");
-        $wresult = fwrite($fp, $content);
+        fwrite($fp, $content);
         fclose($fp);
         return $filename;
     }
 
-    function addToZip($filename = '')
+    private function addToZip($filename = '')
     {
         $this->zipfiles[] = $filename;
     }
 
-    function createAndSaveZip()
+    private function createAndSaveZip()
     {
         if (extension_loaded('zip')) {
             $zip = new ZipArchive();
@@ -260,8 +190,7 @@ class JComponentCreator
             return false;
     }
 
-
-    function generateSiteFolders()
+    private function generateSiteFolders()
     {
         if (!file_exists("site")) {
             mkdir("site");
@@ -269,20 +198,19 @@ class JComponentCreator
             mkdir("site/views/" . $this->compname);
             mkdir("site/views/" . $this->compname . "/tmpl");
         }
-
-        $this->addToZip($this->createFile('site/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile("site/views/" . $this->compname . '/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile("site/views/" . $this->compname . '/tmpl/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile("site/views/" . $this->compname . '/tmpl/default.php', "<?php defined('_JEXEC') or die; ?> <div>    <h2>Test component front-end header...</h2>     <div>         Test component content...    </div></div>"));
-
     }
 
-    function getEmptyHtml()
+    private function getEmptyHtml()
     {
         return '<html><body></body></html>';
     }
 
-    function generateAdminFolders()
+    private function getEmptyPhp()
+    {
+        return "<?php defined('_JEXEC') or die;";
+    }
+
+    private function generateAdminFolders()
     {
         if (!file_exists("admin")) {
             mkdir("admin");
@@ -295,37 +223,9 @@ class JComponentCreator
             mkdir("admin/views/" . $this->compname . "/tmpl");
             mkdir("languages");
         }
-
-        $this->addToZip($this->createFile('admin/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile('admin/controllers/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile('admin/models/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile('admin/models/fields/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile('admin/models/forms/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile('admin/views/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile("admin/views/" . $this->compname . '/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile("admin/views/" . $this->compname . '/tmpl/index.html', $this->getEmptyHtml()));
-        $this->addToZip($this->createFile("admin/views/" . $this->compname . '/tmpl/default.php', "<?php defined('_JEXEC') or die;"));
-        $this->addToZip($this->createFile('languages/en-GB.' . $this->sname . '.ini', strtoupper($this->sname) . '="' . (ucwords($this->name)) . '"'));
-        $this->addToZip($this->createFile('languages/en-GB.' . $this->sname . '.sys.ini', strtoupper($this->sname) . '="' . (ucwords($this->name)) . '"'));
-
-        $php_content = array();
-        $php_content [] = "<?php";
-        $php_content [] = "defined('_JEXEC') or die;";
-        $php_content [] = "jimport('joomla.application.component.view');";
-        $php_content [] = 'class ' . $this->compname . 'View' . $this->compname . ' extends JViewLegacy';
-        $php_content [] = '{';
-        $php_content [] = 'function display($tpl = null) ';
-        $php_content [] = '{';
-        $php_content [] = '  JToolbarHelper::title(JText::_("' . (strtoupper($this->sname)) . '"), "info");';
-        $php_content [] = '  parent::display($tpl);';
-        $php_content [] = '}';
-        $php_content [] = '}';
-        $php_str = implode("\r\n", $php_content);
-
-        $this->addToZip($this->createFile("admin/views/" . $this->compname . '/view.html.php', $php_str));
     }
 
-    function deleteTmpFolders()
+    private function deleteTmpFolders()
     {
         if (file_exists("admin/models/fields")) rmdir("admin/models/fields");
         if (file_exists("admin/models/forms")) rmdir("admin/models/forms");
@@ -343,20 +243,38 @@ class JComponentCreator
         if (file_exists("site")) rmdir("site");
     }
 
-    function run()
+    public function run()
     {
         if (isset($_POST['sname']) && $_POST['name']) {
             $this->addToZip($this->createFile($this->compname . '.xml', $this->generateXml()));
             $this->addToZip($this->createFile('script.php', $this->generateInstallerScript()));
             $this->addToZip($this->createFile('index.html', $this->getEmptyHtml()));
-            $this->generateSiteFolders();
-            $this->generateAdminFolders();
-            $this->addToZip($this->createFile('admin/' . $this->compname . '.php', $this->generateAdminMainPhp()));
-            $this->addToZip($this->createFile('admin/controller.php', $this->generateAdminControllerPhp()));
 
+            $this->generateSiteFolders();
+            $this->addToZip($this->createFile('site/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile("site/views/" . $this->compname . '/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile("site/views/" . $this->compname . '/tmpl/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile("site/views/" . $this->compname . '/tmpl/default.php', $this->generateSiteLayout()));
             $this->addToZip($this->createFile('site/' . $this->compname . '.php', $this->generateSiteMainPhp()));
             $this->addToZip($this->createFile('site/controller.php', $this->generateSiteControllerPhp()));
             $this->addToZip($this->createFile('site/views/' . $this->compname . '/view.html.php', $this->generateSiteViewPhp()));
+
+            $this->generateAdminFolders();
+            $this->addToZip($this->createFile('admin/' . $this->compname . '.php', $this->generateAdminMainPhp()));
+            $this->addToZip($this->createFile('admin/controller.php', $this->generateAdminControllerPhp()));
+            $this->addToZip($this->createFile('admin/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile('admin/controllers/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile('admin/models/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile('admin/models/fields/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile('admin/models/forms/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile('admin/views/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile("admin/views/" . $this->compname . '/view.html.php', $this->generateAdminView()));
+            $this->addToZip($this->createFile("admin/views/" . $this->compname . '/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile("admin/views/" . $this->compname . '/tmpl/index.html', $this->getEmptyHtml()));
+            $this->addToZip($this->createFile("admin/views/" . $this->compname . '/tmpl/default.php', $this->getEmptyPhp()));
+            $this->addToZip($this->createFile('languages/en-GB.' . $this->sname . '.ini', strtoupper($this->sname) . '="' . (ucwords($this->name)) . '"'));
+            $this->addToZip($this->createFile('languages/en-GB.' . $this->sname . '.sys.ini', strtoupper($this->sname) . '="' . (ucwords($this->name)) . '"'));
+
 
             $this->createAndSaveZip();
             $this->deleteTmpFolders();
@@ -365,7 +283,7 @@ class JComponentCreator
         }
     }
 
-    function showForm()
+    private function showForm()
     {
         ?>
         <html>
